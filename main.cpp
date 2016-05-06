@@ -4,7 +4,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     MainWindow w;
+    w.setWindowTitle("CSGO Lounge Statistics");
+
     w.show();
 
     return a.exec();
