@@ -32,8 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Update the table
     if(getLastFilePath() == "") disableUi();
-
     m_currentFile = new QFile(getLastFilePath());
+
+    if(m_currentFile->fileName() == "") disableUi();
+
     updateTable();
 
     //Signals & slots
@@ -275,12 +277,23 @@ void MainWindow::open()
 
     m_currentFile = new QFile(path);
 
-    enableUi();
-    updateTable();
+    if(m_currentFile->fileName() == "") {
+        ui->tableView->setModel(nullptr);
+        disableUi();
+    }
+    else {
+        enableUi();
+        updateTable();
+    }
 }
 
 void MainWindow::save()
 {
+    if(m_currentFile->fileName() == "") {
+        newFile();
+        return;
+    }
+
     if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << m_currentFile->errorString();
         return;
@@ -296,15 +309,19 @@ void MainWindow::save()
 
     m_currentFile->close();
 
+    enableUi();
+    updateTable();
     m_saved = true;
 }
 
 void MainWindow::saveAs()
 {
     QString path = QFileDialog::getSaveFileName(this, "Save File", "./statistics.csv", "*.csv");
-    m_currentFile = new QFile(path);
 
-    save();
+    if(path != "") {
+        m_currentFile = new QFile(path);
+        save();
+    }
 }
 
 void MainWindow::close()
