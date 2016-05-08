@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(getLastFilePath() == "") disableUi();
     m_currentFile = new QFile(getLastFilePath());
 
-    if(m_currentFile->fileName() == "") disableUi();
+    if(m_currentFile->fileName() == "" || m_currentFile->isOpen() == false) disableUi();
 
     updateTable();
 
