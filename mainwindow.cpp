@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QRegExpValidator>
-#include <vector>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -106,6 +105,9 @@ void MainWindow::updateTable()
 
 void MainWindow::updateValues()
 {
+    if(m_table->rowCount() == 0)
+        return;
+
     //Total bets
     //Bets won
     //Bets lost
@@ -120,7 +122,6 @@ void MainWindow::updateValues()
     int betsWon = 0, betsLost = 0;
     double totalMoney = 0, moneyWon = 0, moneyLost = 0;
     double maxWon = 0, maxLost = 0;
-    std::vector<QString> winners, losers;
 
     //Money
     for(int i = 0; i < m_table->rowCount(); i++) {
@@ -143,9 +144,9 @@ void MainWindow::updateValues()
         }
 
         totalMoney += value;
-        winners.push_back(m_table->item(i, 1)->text().toUpper());
-        losers.push_back(m_table->item(i, 2)->text().toUpper());
     }
+
+    updateBestWorstTeams();
 
     ui->totalBetsLineEdit->setText(QString::number(m_table->rowCount()));
     ui->betsLostLineEdit->setText(QString::number(betsLost));
@@ -157,6 +158,48 @@ void MainWindow::updateValues()
     ui->maxLostLineEdit->setText(QString::number(maxLost));
 }
 
+void MainWindow::updateBestWorstTeams()
+{
+    int maxBest = 0, bestTeamRow = 0;
+    int maxWorst = 0, worstTeamRow = 0;
+    for(int i = 0; i < m_table->rowCount(); i++) {
+        int repeatedBest = 0, repeatedWorst = 0;
+
+        for(int j = 0; j < m_table->rowCount(); j++) {
+            //Best
+            if(m_table->item(i, 1)->text().toUpper() == m_table->item(j, 1)->text().toUpper())
+                repeatedBest++;
+            //Worst
+            if(m_table->item(i, 2)->text().toUpper() == m_table->item(j, 2)->text().toUpper())
+                repeatedWorst++;
+        }
+
+        if(repeatedBest >= maxBest) {
+            maxBest = repeatedBest;
+            bestTeamRow = i;
+        }
+        if(repeatedWorst >= maxWorst) {
+            maxWorst = repeatedWorst;
+            worstTeamRow = i;
+        }
+    }
+
+    ui->bestTeamLineEdit->setText(m_table->item(bestTeamRow, 1)->text());
+    ui->worstTeamLineEdit->setText(m_table->item(worstTeamRow, 2)->text());
+}
+
+void MainWindow::offerToSave()
+{
+    int result = QMessageBox::question(this, "CSGO Lounge Statistics", "Changes unsaved. Would you like to save them?",
+                                       QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                       QMessageBox::Yes);
+
+    if(result == QMessageBox::Yes)
+        save();
+    else
+        return;
+}
+
 //// Signals & slots /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::tableChanged()
@@ -166,8 +209,9 @@ void MainWindow::tableChanged()
 
 void MainWindow::newFile()
 {
-    QString path = QFileDialog::getSaveFileName(this, "New File", "./statistics.csv", "*.csv");
+    if(!m_saved) offerToSave();
 
+    QString path = QFileDialog::getSaveFileName(this, "New File", "./statistics.csv", "*.csv");
     m_currentFile = new QFile(path);
 
     if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text))
@@ -183,6 +227,8 @@ void MainWindow::newFile()
 
 void MainWindow::open()
 {
+    if(!m_saved) offerToSave();
+
     QString path = QFileDialog::getOpenFileName(this, "Open File", "./", "*.csv");
 
     m_currentFile = new QFile(path);
@@ -225,7 +271,7 @@ void MainWindow::close()
     }
 
     //If changes unsaved
-    int result = QMessageBox::question(this, "Changes unsaved", "Changes unsaved. Would you like to save them?",
+    int result = QMessageBox::question(this, "CSGO Lounge Statistics", "Changes unsaved. Would you like to save them?",
                                        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                        QMessageBox::Yes);
 

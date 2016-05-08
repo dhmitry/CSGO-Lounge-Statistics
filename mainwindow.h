@@ -43,6 +43,8 @@ private:
 
     void updateTable();
     void updateValues();
+    void updateBestWorstTeams();
+    void offerToSave();
 };
 
 #endif // MAINWINDOW_H
