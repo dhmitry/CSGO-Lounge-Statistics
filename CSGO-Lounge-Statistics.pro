@@ -19,3 +19,4 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
+RC_ICONS = icon.ico

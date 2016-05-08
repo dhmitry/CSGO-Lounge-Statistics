@@ -31,8 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->amountLineEdit->setValidator(validator);
 
     //Update the table
-    m_currentFile = new QFile("statistics.csv");
+    if(getLastFilePath() == "") disableUi();
 
+    m_currentFile = new QFile(getLastFilePath());
     updateTable();
 
     //Signals & slots
@@ -72,8 +73,10 @@ void MainWindow::updateTable()
     m_table->setHorizontalHeaderItem(3, new QStandardItem(QString("Amount")));
 
 
-    if(!m_currentFile->open(QIODevice::ReadOnly))
+    if(!m_currentFile->open(QIODevice::ReadOnly)) {
         qDebug() << m_currentFile->errorString();
+        return;
+    }
 
 
     QTextStream in(m_currentFile);
@@ -98,8 +101,6 @@ void MainWindow::updateTable()
     m_currentFile->close();
 
     ui->tableView->setModel(m_table);
-
-    //Updating values
     updateValues();
 }
 
@@ -200,6 +201,42 @@ void MainWindow::offerToSave()
         return;
 }
 
+QString MainWindow::getLastFilePath() const
+{
+    QFile file("lastfile.txt");
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << file.errorString();
+        return "";
+    }
+
+    QTextStream in(&file);
+    QString path = in.readLine();
+
+    file.close();
+
+    return path;
+}
+
+void MainWindow::enableUi()
+{
+    ui->dateEdit->setEnabled(true);
+    ui->amountLineEdit->setEnabled(true);
+    ui->winnersLineEdit->setEnabled(true);
+    ui->losersLineEdit->setEnabled(true);
+    ui->addButton->setEnabled(true);
+    ui->removeButton->setEnabled(true);
+}
+
+void MainWindow::disableUi()
+{
+    ui->dateEdit->setEnabled(false);
+    ui->amountLineEdit->setEnabled(false);
+    ui->winnersLineEdit->setEnabled(false);
+    ui->losersLineEdit->setEnabled(false);
+    ui->addButton->setEnabled(false);
+    ui->removeButton->setEnabled(false);
+}
+
 //// Signals & slots /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::tableChanged()
@@ -214,14 +251,18 @@ void MainWindow::newFile()
     QString path = QFileDialog::getSaveFileName(this, "New File", "./statistics.csv", "*.csv");
     m_currentFile = new QFile(path);
 
-    if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text))
+
+    if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << m_currentFile->errorString();
+        return;
+    }
 
     QTextStream out(m_currentFile);
         out << ";";
 
     m_currentFile->close();
 
+    enableUi();
     updateTable();
 }
 
@@ -229,17 +270,21 @@ void MainWindow::open()
 {
     if(!m_saved) offerToSave();
 
-    QString path = QFileDialog::getOpenFileName(this, "Open File", "./", "*.csv");
+    QString selectedFilter = "CSV (*.csv)";
+    QString path = QFileDialog::getOpenFileName(this, "Open File", "./", "CSV (*.csv)", &selectedFilter);
 
     m_currentFile = new QFile(path);
 
+    enableUi();
     updateTable();
 }
 
 void MainWindow::save()
 {
-    if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text))
+    if(!m_currentFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << m_currentFile->errorString();
+        return;
+    }
 
     QTextStream out(m_currentFile);
     for(int row = 0; row < m_table->rowCount(); row++) {
@@ -264,6 +309,17 @@ void MainWindow::saveAs()
 
 void MainWindow::close()
 {
+    //Save last file path
+    QFile file("lastfile.txt");
+
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    out << m_currentFile->fileName();
+
+    file.close();
+
     //If changes saved
     if(m_saved) {
         QApplication::exit();
@@ -283,7 +339,6 @@ void MainWindow::close()
         save();
         QApplication::exit();
     }
-
 }
 
 void MainWindow::about()

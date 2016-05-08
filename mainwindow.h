@@ -45,6 +45,10 @@ private:
     void updateValues();
     void updateBestWorstTeams();
     void offerToSave();
+    void enableUi();
+    void disableUi();
+
+    QString getLastFilePath() const;
 };
 
 #endif // MAINWINDOW_H
