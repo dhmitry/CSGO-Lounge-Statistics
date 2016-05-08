@@ -28,11 +28,11 @@ private slots:
     void save();
     void saveAs();
     void close();
+    void about();
     void aboutQt();
 
-    void on_refreshButton_clicked();
-    void on_addButton_clicked();
-    void on_removeButton_clicked();
+    void add();
+    void remove();
 
 private:
     Ui::MainWindow* ui;

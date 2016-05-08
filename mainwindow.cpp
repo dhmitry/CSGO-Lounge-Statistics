@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QRegExpValidator>
+#include <vector>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -26,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->dateEdit->setDate(QDate::currentDate());
 
+    QRegExpValidator* validator = new QRegExpValidator(QRegExp("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?"), this);
+    ui->amountLineEdit->setValidator(validator);
+
     //Update the table
     m_currentFile = new QFile("statistics.csv");
 
@@ -40,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpen, SIGNAL(triggered(bool)), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(close()));
     connect(ui->actionAbout_Qt, SIGNAL(triggered(bool)), this, SLOT(aboutQt()));
+    connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(about()));
+
+    connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(add()));
+    connect(ui->removeButton, SIGNAL(clicked(bool)), this, SLOT(remove()));
 }
 
 MainWindow::~MainWindow()
@@ -97,14 +106,55 @@ void MainWindow::updateTable()
 
 void MainWindow::updateValues()
 {
-    double total = 0;
+    //Total bets
+    //Bets won
+    //Bets lost
+    //Total money
+    //Money won
+    //Money lost
+    //Max won
+    //Max lost
+    //Best team
+    //Worst team
+
+    int betsWon = 0, betsLost = 0;
+    double totalMoney = 0, moneyWon = 0, moneyLost = 0;
+    double maxWon = 0, maxLost = 0;
+    std::vector<QString> winners, losers;
+
+    //Money
     for(int i = 0; i < m_table->rowCount(); i++) {
         QString string = m_table->item(i, 3)->text();
+        double value = string.toDouble();
 
-        total += string.toDouble();
+        if(value >= 0) {
+            betsWon++;
+            moneyWon += value;
+
+            if(i == 0) maxWon = value;
+            else if(value > maxWon) maxWon = value;
+        }
+        else if(value < 0) {
+            betsLost++;
+            moneyLost += value;
+
+            if(i == 0) maxLost = value;
+            else if(value < maxLost) maxLost = value;
+        }
+
+        totalMoney += value;
+        winners.push_back(m_table->item(i, 1)->text().toUpper());
+        losers.push_back(m_table->item(i, 2)->text().toUpper());
     }
 
-    ui->totalLineEdit->setText(QString::number(total));
+    ui->totalBetsLineEdit->setText(QString::number(m_table->rowCount()));
+    ui->betsLostLineEdit->setText(QString::number(betsLost));
+    ui->betsWonLineEdit->setText(QString::number(betsWon));
+    ui->totalMoneyLineEdit->setText(QString::number(totalMoney));
+    ui->moneyLostLineEdit->setText(QString::number(moneyLost));
+    ui->moneyWonLineEdit->setText(QString::number(moneyWon));
+    ui->maxWonLineEdit->setText(QString::number(maxWon));
+    ui->maxLostLineEdit->setText(QString::number(maxLost));
 }
 
 //// Signals & slots /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,6 +204,8 @@ void MainWindow::save()
     }
 
     m_currentFile->close();
+
+    m_saved = true;
 }
 
 void MainWindow::saveAs()
@@ -188,18 +240,17 @@ void MainWindow::close()
 
 }
 
+void MainWindow::about()
+{
+    QMessageBox::information(this, "About", "This program was made by dhmitry.", QMessageBox::Ok);
+}
+
 void MainWindow::aboutQt()
 {
     qApp->aboutQt();
 }
 
-
-void MainWindow::on_refreshButton_clicked()
-{
-    updateTable();
-}
-
-void MainWindow::on_addButton_clicked()
+void MainWindow::add()
 {    
     //Check if all information is entered
     if(ui->dateEdit->date().toString("yyyy.MM.dd") == "" || ui->winnersLineEdit->text() == "" ||
@@ -228,10 +279,12 @@ void MainWindow::on_addButton_clicked()
     ui->amountLineEdit->clear();
 
     m_saved = false;
+
+    ui->tableView->sortByColumn(0, Qt::DescendingOrder);
     updateValues();
 }
 
-void MainWindow::on_removeButton_clicked()
+void MainWindow::remove()
 {
     QModelIndexList selection = ui->tableView->selectionModel()->selectedRows();
     if(selection.count() == 0)
