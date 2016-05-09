@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QRegExpValidator>
+#include <QList>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -243,6 +244,7 @@ void MainWindow::disableUi()
 
 void MainWindow::tableChanged()
 {
+    updateValues();
     m_saved = false;
 }
 
@@ -384,12 +386,13 @@ void MainWindow::add()
     QStandardItem* losers = new QStandardItem(ui->losersLineEdit->text());
     QStandardItem* amount = new QStandardItem(ui->amountLineEdit->text());
 
-    int rows = m_table->rowCount();
+    QList<QStandardItem*> newRow;
+    newRow.append(date);
+    newRow.append(winners);
+    newRow.append(losers);
+    newRow.append(amount);
 
-    m_table->setItem(rows, 0, date);
-    m_table->setItem(rows, 1, winners);
-    m_table->setItem(rows, 2, losers);
-    m_table->setItem(rows, 3, amount);
+    m_table->insertRow(m_table->rowCount(), newRow);
 
     //Reset line edits
     ui->winnersLineEdit->clear();
@@ -397,6 +400,7 @@ void MainWindow::add()
     ui->amountLineEdit->clear();
 
     m_saved = false;
+
 
     ui->tableView->sortByColumn(0, Qt::DescendingOrder);
     updateValues();
