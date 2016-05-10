@@ -1,2 +1,2 @@
-# CSGO-Lounge-Statistics
-Betting statistics for CSGO Lounge.
+# Betting-Statistics
+Betting statistics made with Qt.
