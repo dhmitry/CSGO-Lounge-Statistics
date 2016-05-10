@@ -204,7 +204,7 @@ void MainWindow::updateBestWorstTeams()
 
 void MainWindow::offerToSave()
 {
-    int result = QMessageBox::question(this, "CSGO Lounge Statistics", "Changes unsaved. Would you like to save them?",
+    int result = QMessageBox::question(this, "Betting Statistics", "Changes unsaved. Would you like to save them?",
                                        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                        QMessageBox::Yes);
 
@@ -354,7 +354,7 @@ void MainWindow::close()
     }
 
     //If changes unsaved, ask if user would like to save them
-    int result = QMessageBox::question(this, "CSGO Lounge Statistics", "Changes unsaved. Would you like to save them?",
+    int result = QMessageBox::question(this, "Betting Statistics", "Changes unsaved. Would you like to save them?",
                                        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                        QMessageBox::Yes);
 
@@ -383,7 +383,7 @@ void MainWindow::add()
     //Check if all information is entered
     if(ui->dateEdit->date().toString("yyyy.MM.dd") == "" || ui->winnersLineEdit->text() == "" ||
        ui->losersLineEdit->text() == "" || ui->amountLineEdit->text() == "") {
-        QMessageBox::information(this, "CSGO Lounge Statistics", "You need to enter all information!");
+        QMessageBox::information(this, "Betting Statistics", "You need to enter all information!");
 
         return;
     }
