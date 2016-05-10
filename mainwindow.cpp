@@ -37,10 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if(m_currentFile->fileName() == "" || !m_currentFile->exists()) disableUi();
 
-    updateTable();
+    loadTable();
 
     //Signals & slots
-    connect(m_table, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableChanged()));
+    connect(m_table, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(tableChanged()));
 
     connect(ui->actionNew, SIGNAL(triggered(bool)), this, SLOT(newFile()));
     connect(ui->actionSave, SIGNAL(triggered(bool)), this, SLOT(save()));
@@ -65,7 +65,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     close();
 }
 
-void MainWindow::updateTable()
+void MainWindow::loadTable()
 {
     //Setting up the table & loading from file
     m_table = new QStandardItemModel;
@@ -164,32 +164,42 @@ void MainWindow::updateValues()
 
 void MainWindow::updateBestWorstTeams()
 {
-    int maxBest = 0, bestTeamRow = 0;
-    int maxWorst = 0, worstTeamRow = 0;
+    int maxBestWins = 0, bestTeamWinsRow = 0;
+    int maxWorstLosses = 0, worstTeamRow = 0;
+    double maxMostMoney = 0;
+    int bestTeamMoneyRow = 0;
     for(int i = 0; i < m_table->rowCount(); i++) {
         int repeatedBest = 0, repeatedWorst = 0;
+        double mostMoney = 0;
 
         for(int j = 0; j < m_table->rowCount(); j++) {
             //Best
-            if(m_table->item(i, 1)->text().toUpper() == m_table->item(j, 1)->text().toUpper())
+            if(m_table->item(i, 1)->text().toUpper() == m_table->item(j, 1)->text().toUpper()) {
                 repeatedBest++;
+                mostMoney += m_table->item(j, 3)->text().toDouble();
+            }
             //Worst
             if(m_table->item(i, 2)->text().toUpper() == m_table->item(j, 2)->text().toUpper())
                 repeatedWorst++;
         }
 
-        if(repeatedBest >= maxBest) {
-            maxBest = repeatedBest;
-            bestTeamRow = i;
+        if(repeatedBest >= maxBestWins) {
+            maxBestWins = repeatedBest;
+            bestTeamWinsRow = i;
         }
-        if(repeatedWorst >= maxWorst) {
-            maxWorst = repeatedWorst;
+        if(repeatedWorst >= maxWorstLosses) {
+            maxWorstLosses = repeatedWorst;
             worstTeamRow = i;
+        }
+        if(mostMoney >= maxMostMoney) {
+            maxMostMoney = mostMoney;
+            bestTeamMoneyRow = i;
         }
     }
 
-    ui->bestTeamLineEdit->setText(m_table->item(bestTeamRow, 1)->text());
-    ui->worstTeamLineEdit->setText(m_table->item(worstTeamRow, 2)->text());
+    ui->bestTeamWinsLineEdit->setText(m_table->item(bestTeamWinsRow, 1)->text());
+    ui->bestTeamMoneyLineEdit->setText(m_table->item(bestTeamMoneyRow, 1)->text());
+    ui->worstTeamLossesLineEdit->setText(m_table->item(worstTeamRow, 2)->text());
 }
 
 void MainWindow::offerToSave()
@@ -267,7 +277,7 @@ void MainWindow::newFile()
     m_currentFile->close();
 
     enableUi();
-    updateTable();
+    loadTable();
 }
 
 void MainWindow::open()
@@ -285,7 +295,7 @@ void MainWindow::open()
     }
     else {
         enableUi();
-        updateTable();
+        loadTable();
     }
 }
 
@@ -311,8 +321,6 @@ void MainWindow::save()
 
     m_currentFile->close();
 
-    enableUi();
-    updateTable();
     m_saved = true;
 }
 
@@ -339,13 +347,13 @@ void MainWindow::close()
 
     file.close();
 
-    //If changes saved
+    //If changes saved, exit the application
     if(m_saved) {
         QApplication::exit();
         return;
     }
 
-    //If changes unsaved
+    //If changes unsaved, ask if user would like to save them
     int result = QMessageBox::question(this, "CSGO Lounge Statistics", "Changes unsaved. Would you like to save them?",
                                        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                        QMessageBox::Yes);
@@ -409,10 +417,15 @@ void MainWindow::add()
 void MainWindow::remove()
 {
     QModelIndexList selection = ui->tableView->selectionModel()->selectedRows();
+
     if(selection.count() == 0)
         return;
 
-    m_table->removeRows(selection.first().row(), selection.count());
+    while(!selection.isEmpty()) {
+        m_table->removeRow(selection.last().row());
+        selection.removeLast();
+    }
+
 
     m_saved = false;
     updateValues();

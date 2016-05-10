@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>644</width>
-    <height>505</height>
+    <height>525</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -190,67 +190,16 @@
      </layout>
     </item>
     <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
-       <layout class="QVBoxLayout" name="betsLostLayout">
-        <item>
-         <widget class="QLabel" name="betsLostLabel">
-          <property name="text">
-           <string>Bets lost:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="betsLostLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
+     <layout class="QGridLayout" name="statisticsLayout">
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
       <item row="2" column="1">
-       <layout class="QVBoxLayout" name="maxLostLayout">
-        <item>
-         <widget class="QLabel" name="maxLostLabel">
-          <property name="text">
-           <string>Max lost:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="maxLostLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="3" column="0">
-       <layout class="QVBoxLayout" name="bestTeamLayout">
-        <item>
-         <widget class="QLabel" name="bestTeamLabel">
-          <property name="text">
-           <string>Best Team:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="bestTeamLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="1">
        <layout class="QVBoxLayout" name="moneyWonLayout">
         <item>
          <widget class="QLabel" name="moneyWonLabel">
           <property name="text">
-           <string>Money won:</string>
+           <string>Money won</string>
           </property>
          </widget>
         </item>
@@ -263,30 +212,12 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="2">
-       <layout class="QVBoxLayout" name="moneyLostLayout">
-        <item>
-         <widget class="QLabel" name="moneyLostLabel">
-          <property name="text">
-           <string>Money lost:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="moneyLostLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <layout class="QVBoxLayout" name="totalMoneyLayout">
         <item>
          <widget class="QLabel" name="totalMoneyLabel">
           <property name="text">
-           <string>Total money:</string>
+           <string>Total money</string>
           </property>
          </widget>
         </item>
@@ -299,17 +230,17 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="1">
-       <layout class="QVBoxLayout" name="worstTeamLayout">
+      <item row="2" column="2">
+       <layout class="QVBoxLayout" name="moneyLostLayout">
         <item>
-         <widget class="QLabel" name="worstTeamLabel">
+         <widget class="QLabel" name="moneyLostLabel">
           <property name="text">
-           <string>Worst team:</string>
+           <string>Money lost</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="worstTeamLineEdit">
+         <widget class="QLineEdit" name="moneyLostLineEdit">
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -317,12 +248,12 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <layout class="QVBoxLayout" name="betsWonLayout">
         <item>
          <widget class="QLabel" name="betsWonLabel">
           <property name="text">
-           <string>Bets won:</string>
+           <string>Bets won</string>
           </property>
          </widget>
         </item>
@@ -335,12 +266,30 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="0">
+      <item row="3" column="0">
+       <layout class="QVBoxLayout" name="maxWonLayout">
+        <item>
+         <widget class="QLabel" name="maxWonLabel">
+          <property name="text">
+           <string>Max money won</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="maxWonLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
        <layout class="QVBoxLayout" name="totalBetsLayout">
         <item>
          <widget class="QLabel" name="totalBetsLabel">
           <property name="text">
-           <string>Total bets:</string>
+           <string>Total bets</string>
           </property>
          </widget>
         </item>
@@ -353,17 +302,109 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
-       <layout class="QVBoxLayout" name="maxWonLayout">
+      <item row="1" column="2">
+       <layout class="QVBoxLayout" name="betsLostLayout">
         <item>
-         <widget class="QLabel" name="maxWonLabel">
+         <widget class="QLabel" name="betsLostLabel">
           <property name="text">
-           <string>Max won:</string>
+           <string>Bets lost</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="maxWonLineEdit">
+         <widget class="QLineEdit" name="betsLostLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="1">
+       <layout class="QVBoxLayout" name="maxLostLayout">
+        <item>
+         <widget class="QLabel" name="maxLostLabel">
+          <property name="text">
+           <string>Max money lost</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="maxLostLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="0">
+       <layout class="QVBoxLayout" name="bestTeamWinsLayout">
+        <item>
+         <widget class="QLabel" name="bestTeamWinsLabel">
+          <property name="text">
+           <string>Best Team (most wins)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="bestTeamWinsLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0" colspan="3">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <layout class="QVBoxLayout" name="bestTeamMoneyLayout">
+        <item>
+         <widget class="QLabel" name="bestTeamMoneyLabel">
+          <property name="text">
+           <string>Best Team (most money)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="bestTeamMoneyLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="2">
+       <layout class="QVBoxLayout" name="worstTeamLossesLayout">
+        <item>
+         <widget class="QLabel" name="worstTeamLossesBetsLabel">
+          <property name="text">
+           <string>Worst team (most losses)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="worstTeamLossesLineEdit">
           <property name="readOnly">
            <bool>true</bool>
           </property>

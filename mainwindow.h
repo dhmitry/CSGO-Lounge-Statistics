@@ -41,7 +41,7 @@ private:
 
     bool m_saved;
 
-    void updateTable();
+    void loadTable();
     void updateValues();
     void updateBestWorstTeams();
     void offerToSave();
