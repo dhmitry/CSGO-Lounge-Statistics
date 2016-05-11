@@ -44,6 +44,10 @@ private:
     void loadTable();
     void updateValues();
     void updateBestWorstTeams();
+
+    void setupPlot();
+    void updatePlotData();
+
     void offerToSave();
     void enableUi();
     void disableUi();

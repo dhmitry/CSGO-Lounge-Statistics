@@ -9,6 +9,9 @@
 #include <QCloseEvent>
 #include <QRegExpValidator>
 #include <QList>
+#include <QVector>
+#include <QPen>
+#include <QColor>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,8 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
     if(m_currentFile->fileName() == "" || !m_currentFile->exists()) disableUi();
 
     loadTable();
+    setupPlot();
 
     //Signals & slots
+    connect(m_table, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableChanged()));
     connect(m_table, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(tableChanged()));
 
     connect(ui->actionNew, SIGNAL(triggered(bool)), this, SLOT(newFile()));
@@ -164,31 +169,31 @@ void MainWindow::updateValues()
 
 void MainWindow::updateBestWorstTeams()
 {
-    int maxBestWins = 0, bestTeamWinsRow = 0;
-    int maxWorstLosses = 0, worstTeamRow = 0;
+    int maxWins = 0, bestTeamWinsRow = 0;
+    int maxLosses = 0, worstTeamRow = 0;
     double maxMostMoney = 0;
     int bestTeamMoneyRow = 0;
     for(int i = 0; i < m_table->rowCount(); i++) {
-        int repeatedBest = 0, repeatedWorst = 0;
+        int wins = 0, losses = 0;
         double mostMoney = 0;
 
         for(int j = 0; j < m_table->rowCount(); j++) {
             //Best
             if(m_table->item(i, 1)->text().toUpper() == m_table->item(j, 1)->text().toUpper()) {
-                repeatedBest++;
+                wins++;
                 mostMoney += m_table->item(j, 3)->text().toDouble();
             }
             //Worst
             if(m_table->item(i, 2)->text().toUpper() == m_table->item(j, 2)->text().toUpper())
-                repeatedWorst++;
+                losses++;
         }
 
-        if(repeatedBest >= maxBestWins) {
-            maxBestWins = repeatedBest;
+        if(wins >= maxWins) {
+            maxWins = wins;
             bestTeamWinsRow = i;
         }
-        if(repeatedWorst >= maxWorstLosses) {
-            maxWorstLosses = repeatedWorst;
+        if(losses >= maxLosses) {
+            maxLosses = losses;
             worstTeamRow = i;
         }
         if(mostMoney >= maxMostMoney) {
@@ -197,9 +202,54 @@ void MainWindow::updateBestWorstTeams()
         }
     }
 
-    ui->bestTeamWinsLineEdit->setText(m_table->item(bestTeamWinsRow, 1)->text());
-    ui->bestTeamMoneyLineEdit->setText(m_table->item(bestTeamMoneyRow, 1)->text());
-    ui->worstTeamLossesLineEdit->setText(m_table->item(worstTeamRow, 2)->text());
+    ui->bestTeamWinsLineEdit->setText(m_table->item(bestTeamWinsRow, 1)->text() + " (" + QString::number(maxWins) + ")");
+    ui->bestTeamMoneyLineEdit->setText(m_table->item(bestTeamMoneyRow, 1)->text() + " (" + QString::number(maxMostMoney) + ")");
+    ui->worstTeamLossesLineEdit->setText(m_table->item(worstTeamRow, 2)->text() + " (" + QString::number(maxLosses) + ")");
+}
+
+void MainWindow::setupPlot()
+{
+    if(ui->plot->graphCount() > 0)
+        ui->plot->removeGraph(0);
+
+    ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+    ui->plot->addGraph();
+    ui->plot->graph(0)->setPen(QPen(QColor(30, 144, 255)));
+
+    ui->plot->xAxis->setVisible(false);
+    ui->plot->xAxis->setOffset(10);
+    ui->plot->xAxis->grid()->setPen(QPen(Qt::white));
+    ui->plot->xAxis->grid()->setZeroLinePen(QPen(Qt::white));
+
+    ui->plot->yAxis->setOffset(10);
+    ui->plot->yAxis->grid()->setPen(QPen(Qt::white));
+
+    ui->plot->xAxis2->setVisible(false);
+    ui->plot->xAxis2->setOffset(10);
+    ui->plot->xAxis2->setTicks(false);
+
+    ui->plot->yAxis2->setVisible(true);
+    ui->plot->yAxis2->setOffset(10);
+    ui->plot->yAxis2->setTicks(false);
+
+    updatePlotData();
+}
+
+void MainWindow::updatePlotData()
+{
+    QVector<double> x, y;
+    for(int i = 0; i < m_table->rowCount(); i++) {
+        x.push_back(i);
+        y.push_back(m_table->item(i, 3)->text().toDouble());
+    }
+
+    ui->plot->graph(0)->setData(x, y);
+
+    ui->plot->xAxis->setRange(0, m_table->rowCount() - 1);
+    ui->plot->yAxis->setRange(ui->maxLostLineEdit->text().toDouble()*1.2, ui->maxWonLineEdit->text().toDouble()*1.2);
+
+    ui->plot->replot();
 }
 
 void MainWindow::offerToSave()
@@ -238,6 +288,8 @@ void MainWindow::enableUi()
     ui->losersLineEdit->setEnabled(true);
     ui->addButton->setEnabled(true);
     ui->removeButton->setEnabled(true);
+
+    ui->plot->setEnabled(true);
 }
 
 void MainWindow::disableUi()
@@ -248,13 +300,21 @@ void MainWindow::disableUi()
     ui->losersLineEdit->setEnabled(false);
     ui->addButton->setEnabled(false);
     ui->removeButton->setEnabled(false);
+
+    ui->plot->removeGraph(0);
+    ui->plot->replot();
+    ui->plot->setEnabled(false);
 }
 
 //// Signals & slots /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::tableChanged()
 {
+    ui->tableView->sortByColumn(0, Qt::DescendingOrder);
+
     updateValues();
+    updatePlotData();
+
     m_saved = false;
 }
 
@@ -296,6 +356,7 @@ void MainWindow::open()
     else {
         enableUi();
         loadTable();
+        setupPlot();
     }
 }
 
@@ -370,7 +431,7 @@ void MainWindow::close()
 
 void MainWindow::about()
 {
-    QMessageBox::information(this, "About", "This program was made by dhmitry.", QMessageBox::Ok);
+    QMessageBox::information(this, "About", "This program was made by dhmitry\nVersion 1.0.3", QMessageBox::Ok);
 }
 
 void MainWindow::aboutQt()
@@ -407,11 +468,12 @@ void MainWindow::add()
     ui->losersLineEdit->clear();
     ui->amountLineEdit->clear();
 
-    m_saved = false;
-
 
     ui->tableView->sortByColumn(0, Qt::DescendingOrder);
+
+    m_saved = false;
     updateValues();
+    updatePlotData();
 }
 
 void MainWindow::remove()
@@ -429,4 +491,5 @@ void MainWindow::remove()
 
     m_saved = false;
     updateValues();
+    updatePlotData();
 }

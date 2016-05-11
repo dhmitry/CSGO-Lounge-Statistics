@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>644</width>
-    <height>525</height>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -230,24 +230,6 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="2">
-       <layout class="QVBoxLayout" name="moneyLostLayout">
-        <item>
-         <widget class="QLabel" name="moneyLostLabel">
-          <property name="text">
-           <string>Money lost</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="moneyLostLineEdit">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="1" column="1">
        <layout class="QVBoxLayout" name="betsWonLayout">
         <item>
@@ -266,17 +248,17 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
-       <layout class="QVBoxLayout" name="maxWonLayout">
+      <item row="2" column="2">
+       <layout class="QVBoxLayout" name="moneyLostLayout">
         <item>
-         <widget class="QLabel" name="maxWonLabel">
+         <widget class="QLabel" name="moneyLostLabel">
           <property name="text">
-           <string>Max money won</string>
+           <string>Money lost</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="maxWonLineEdit">
+         <widget class="QLineEdit" name="moneyLostLineEdit">
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -302,17 +284,17 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="2">
-       <layout class="QVBoxLayout" name="betsLostLayout">
+      <item row="3" column="0">
+       <layout class="QVBoxLayout" name="maxWonLayout">
         <item>
-         <widget class="QLabel" name="betsLostLabel">
+         <widget class="QLabel" name="maxWonLabel">
           <property name="text">
-           <string>Bets lost</string>
+           <string>Max money won</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="betsLostLineEdit">
+         <widget class="QLineEdit" name="maxWonLineEdit">
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -338,6 +320,34 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="2">
+       <layout class="QVBoxLayout" name="betsLostLayout">
+        <item>
+         <widget class="QLabel" name="betsLostLabel">
+          <property name="text">
+           <string>Bets lost</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="betsLostLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0">
        <layout class="QVBoxLayout" name="bestTeamWinsLayout">
         <item>
@@ -358,16 +368,6 @@
       </item>
       <item row="4" column="0" colspan="3">
        <widget class="QFrame" name="frame">
-        <property name="frameShape">
-         <enum>QFrame::HLine</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="3">
-       <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::HLine</enum>
         </property>
@@ -412,11 +412,32 @@
         </item>
        </layout>
       </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QCustomPlot" name="plot" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>150</height>
+       </size>
+      </property>
+     </widget>
     </item>
    </layout>
    <zorder>tableView</zorder>
    <zorder></zorder>
+   <zorder>plot</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -498,6 +519,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
