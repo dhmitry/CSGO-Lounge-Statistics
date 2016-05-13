@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(add()));
     connect(ui->removeButton, SIGNAL(clicked(bool)), this, SLOT(remove()));
+    connect(ui->resetGraphButton, SIGNAL(clicked(bool)), this, SLOT(resetGraph()));
 }
 
 MainWindow::~MainWindow()
@@ -88,7 +89,7 @@ void MainWindow::loadTable()
 
 
     QTextStream in(m_currentFile);
-    int row = 0;
+    unsigned int row = 0;
     while(!in.atEnd()) {
         QString line = in.readLine();
 
@@ -239,15 +240,23 @@ void MainWindow::setupPlot()
 void MainWindow::updatePlotData()
 {
     QVector<double> x, y;
-    for(int i = 0; i < m_table->rowCount(); i++) {
-        x.push_back(i);
-        y.push_back(m_table->item(i, 3)->text().toDouble());
+    x.push_back(0);
+    y.push_back(0);
+
+    double total = 0;
+
+    for(int i = m_table->rowCount(); i > 0; i--) {
+        x.push_back(m_table->rowCount() + 1 - i);
+
+        total += m_table->item(i - 1, 3)->text().toDouble();
+        y.push_back(total);
     }
 
     ui->plot->graph(0)->setData(x, y);
 
-    ui->plot->xAxis->setRange(0, m_table->rowCount() - 1);
-    ui->plot->yAxis->setRange(ui->maxLostLineEdit->text().toDouble()*1.2, ui->maxWonLineEdit->text().toDouble()*1.2);
+    ui->plot->xAxis->setRange(0, m_table->rowCount());
+    ui->plot->yAxis->setRange(ui->moneyLostLineEdit->text().toDouble(), ui->moneyWonLineEdit->text().toDouble());
+
 
     ui->plot->replot();
 }
@@ -312,10 +321,10 @@ void MainWindow::tableChanged()
 {
     ui->tableView->sortByColumn(0, Qt::DescendingOrder);
 
+    m_saved = false;
+
     updateValues();
     updatePlotData();
-
-    m_saved = false;
 }
 
 void MainWindow::newFile()
@@ -358,6 +367,7 @@ void MainWindow::open()
         loadTable();
         setupPlot();
     }
+
 }
 
 void MainWindow::save()
@@ -491,5 +501,10 @@ void MainWindow::remove()
 
     m_saved = false;
     updateValues();
+    updatePlotData();
+}
+
+void MainWindow::resetGraph()
+{
     updatePlotData();
 }

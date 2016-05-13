@@ -33,12 +33,12 @@ private slots:
 
     void add();
     void remove();
+    void resetGraph();
 
 private:
     Ui::MainWindow* ui;
     QStandardItemModel* m_table;
     QFile* m_currentFile;
-
     bool m_saved;
 
     void loadTable();
